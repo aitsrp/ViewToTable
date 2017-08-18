@@ -1,0 +1,100 @@
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
+Filename: ViewGS_G4
+Row: 0
+Error: ERROR [42S02] [MySQL][ODBC 5.3(w) Driver][mysqld-5.7.16-log]Table 'votf_reports.viewgs_g4' doesn't exist
+Query: SELECT * FROM ViewGS_G4;
+ 
