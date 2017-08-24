@@ -313,7 +313,7 @@ namespace ViewToTable
                     {
                         if (m == 131) //if it's the last column
                         {
-                            if (list[j][m] == null)
+                            if (list[j][m] == "")
                             {
                                 queryInsert1 += "NULL);";
                             }
@@ -330,7 +330,7 @@ namespace ViewToTable
                         }
                         else //while it's not the last column
                         {
-                            if (list[j][m] == null)
+                            if (list[j][m] == "")
                             {
                                 queryInsert1 += "NULL,";
                             }
@@ -371,7 +371,7 @@ namespace ViewToTable
                     {
                         if (o == (cols - 1)) //if it's the last column
                         {
-                            if (list[j][o] == null)
+                            if (list[j][o] == "")
                             {
                                 queryInsert2 += "NULL);";
                             }
@@ -389,7 +389,7 @@ namespace ViewToTable
                         }
                         else //while it's not the last column
                         {
-                            if (list[j][o] == null)
+                            if (list[j][o] == "")
                             {
                                 queryInsert2 += "NULL,";
                             }
@@ -466,7 +466,7 @@ namespace ViewToTable
                     {
                         if (m == (cols - 1)) //if it's the last column
                         {
-                            if (list[j][m] == null)
+                            if (list[j][m] == "")
                             {
                                 queryInsert += "NULL);";
                             }
@@ -477,7 +477,7 @@ namespace ViewToTable
                         }
                         else //while it's not the last column
                         {
-                            if (list[j][m] == null)
+                            if (list[j][m] == "")
                             {
                                 queryInsert += "NULL,";
                             }
