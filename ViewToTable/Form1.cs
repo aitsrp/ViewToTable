@@ -36,7 +36,7 @@ namespace ViewToTable
                 var path = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
                 FileInfo inf = new FileInfo(path);
                 string ext = inf.Extension.ToLower();
-                if (ext == ".xls" || ext == ".xlsx" || ext == ".vls")
+                if (ext == ".xls" || ext == ".xlsx" || ext == ".vls" || ext == ".sql")
                     effect = DragDropEffects.Copy;
             }
 
@@ -55,7 +55,7 @@ namespace ViewToTable
                     FileInfo inf = new FileInfo(path);
                     var filename = inf.Name;
                     progressBar1.Value = 0;
-                    if(inf.Extension == ".vls")
+                    if (inf.Extension == ".vls")
                     {
                         List<string> viewname = new List<string>();
                         var completed = 0;
@@ -63,13 +63,13 @@ namespace ViewToTable
                         string[] lines = System.IO.File.ReadAllLines(path);
                         foreach (string line in lines)
                         {
-                            if(line.StartsWith("//") || (line == ""))
+                            if (line.StartsWith("//") || (line == ""))
                             {
                                 Console.WriteLine("ignored: " + line);
                             }
                             else
                             {
-                                if(line.Contains(", "))
+                                if (line.Contains(", "))
                                 {
                                     string[] arr = line.Split(',');
                                     viewname.AddRange(arr);
@@ -89,29 +89,72 @@ namespace ViewToTable
                             progressBar1.Minimum = 0;
                             progressBar1.Maximum = viewname.Count;
                             progressBar1.PerformStep();
-                            label1.Text = completed + " of " + viewname.Count + " views";
+                            label1.Text = "Processing view " + completed + " of " + viewname.Count + " views";
                             label1.Refresh();
                         }
                     }
-                    else if(filename.Contains("234584")) //General Survey Results
+                    else if (inf.Extension == ".sql")
+                    {
+                        string content = File.ReadAllText(path);
+                        string[] lst = content.Split(';');
+                        foreach (string str in lst)
+                        {
+                            if (str.Trim() != "")
+                            {
+                                server.Query = str;
+                                server.ExecuteNonQuery();
+                            }
+                        }
+
+                    }
+                    else if (filename.Contains("234584")) //General Survey Results
                     {
                         Console.WriteLine("Processing General Survey Results...");
                         Proj_LogError("Processing General Survey Results...");
-                        generalSurveyResults(path);
+                        generalSurveyResults(path, "_generalsurveyresults");
+                    }
+                    else if (filename.Contains("672569")) //General Survey Results Midpoint
+                    {
+                        Console.WriteLine("Processing General Survey Results Midpoint...");
+                        Proj_LogError("Processing General Survey Results Midpoint...");
+                        generalSurveyResults(path, "_generalsurveyresultsm");
+                    }
+                    else if (filename.Contains("787585")) //General Survey Results Final
+                    {
+                        Console.WriteLine("Processing General Survey Results Final...");
+                        Proj_LogError("Processing General Survey Results Final...");
+                        generalSurveyResults(path, "_generalsurveyresultsf");
                     }
                     else if (filename.Contains("972221")) // Product Survey Results
                     {
                         Console.WriteLine("Processing Product Survey Results...");
                         Proj_LogError("Processing Product Survey Results...");
-                        productSurveyResults(path);
+                        otherSurveyResults(path, "_productsurveyresults");
+                    }
+                    else if (filename.Contains("788185")) // Product Survey Results Final
+                    {
+                        Console.WriteLine("Processing Product Survey Results Final...");
+                        Proj_LogError("Processing Product Survey Results Final...");
+                        otherSurveyResults(path, "_productsurveyresultsf");
                     }
                     else if (filename.Contains("977717")) //Retailer Survey Results
                     {
                         Console.WriteLine("Processing Retailer Survey Results...");
                         Proj_LogError("Processing Retailer Survey Results...");
-                        retailerSurveyResults(path);
+                        otherSurveyResults(path, "_retailersurveyresults");
                     }
-                    //textBox1.Text += ExcelToJSON(path);
+                    else if (filename.Contains("818999")) //Retailer Survey Results Midpoint
+                    {
+                        Console.WriteLine("Processing Retailer Survey Results Midpoint...");
+                        Proj_LogError("Processing Retailer Survey Results Midpoint...");
+                        otherSurveyResults(path, "_retailersurveyresultsm");
+                    }
+                    else if (filename.Contains("473321")) //Retailer Survey Results Final
+                    {
+                        Console.WriteLine("Processing Retailer Survey Results Final...");
+                        Proj_LogError("Processing Retailer Survey Results Final...");
+                        otherSurveyResults(path, "_retailersurveyresultsf");
+                    }
                     if (i == filelist.Length - 1)
                     {
                         Console.WriteLine("Process done!");
@@ -129,6 +172,7 @@ namespace ViewToTable
             string queryView = "SELECT * FROM " + filename + ";";
             server.Query = queryView;
             textBox1.Text = "queryView: " + queryView;
+            textBox1.Refresh();
             //Console.WriteLine("queryView: " + queryView);//delete
             bool exists = server.ExecuteNonQuery();
             if (exists)
@@ -157,6 +201,7 @@ namespace ViewToTable
                 }
 
                 textBox1.Text = "queryCreate: " + queryCreate;
+                textBox1.Refresh();
                 //Console.WriteLine("queryCreate: " + queryCreate);//delete
                 server.Query = queryCreate;
                 server.ExecuteNonQuery();
@@ -189,6 +234,7 @@ namespace ViewToTable
                         }
                     }
                     textBox1.Text = "queryInsert: " + queryInsert;
+                    textBox1.Refresh();
                     //Console.WriteLine("queryInsert: " + queryInsert);//delete
                     server.Row = r;
                     server.Query = queryInsert;
@@ -203,316 +249,260 @@ namespace ViewToTable
             }
         }
 
-        private void generalSurveyResults(string file)
+        private void generalSurveyResults(string file, string tablename)
         {
-            server.Filename = file;
-            server.Query = "TRUNCATE _generalsurveyresults1;";
-            server.ExecuteNonQuery();
-            server.Query = "TRUNCATE _generalsurveyresults2;";
-            server.ExecuteNonQuery();
-            server.Query = "SELECT * FROM _generalsurveyresults1;";
-            DataTable dt1 = server.ExecuteQuery();
-            server.Query = "SELECT * FROM _generalsurveyresults2;";
-            DataTable dt2 = server.ExecuteQuery();
+            Excel.Application xlApp = new Excel.Application();
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(file);
+
             if (file != "")
             {
-                //Read File
-                Excel.Application xlApp = new Excel.Application();
-                Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(file);
+                List<List<string>> list = SheetToList(xlWorkbook.Sheets[1]);
+                var cols = list[0].Count;
+                var rows = list.Count;
+                progressBar1.Value = 0;
+                server.Filename = file;
 
-                for (var i = 1; i <= xlWorkbook.Sheets.Count; i++)
+                string queryTable1 = "SELECT 1 FROM " + tablename + "1 LIMIT 1;";
+                server.Query = queryTable1;
+                textBox1.Text = "queryView: " + queryTable1;
+                textBox1.Refresh();
+                //Console.WriteLine("queryTable1: " + queryTable1);
+                bool exists1 = server.ExecuteNonQuery();
+                if (!exists1)
                 {
-                    Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[i];
-                    Excel.Range xlRange = xlWorksheet.UsedRange;
-                    
-                    for(var j=2; j < 334; j++)//loop through entries aka rows because excel rows start at row 2 and ends at row 333
+                    createTable((tablename + "1"), list, 1, 132);
+                }
+
+                string queryTable2 = "SELECT 1 FROM " + tablename + "2 LIMIT 1;";
+                server.Query = queryTable2;
+                textBox1.Text = "queryView: " + queryTable2;
+                textBox1.Refresh();
+                //Console.WriteLine("queryTable2: " + queryTable2);
+                bool exists2 = server.ExecuteNonQuery();
+                if (!exists2)
+                {
+                    createTable((tablename + "2"), list, 132, cols);
+                }
+
+                server.Query = "TRUNCATE " + tablename + "1;";
+                server.ExecuteNonQuery();
+                server.Query = "TRUNCATE " + tablename + "2;";
+                server.ExecuteNonQuery();
+                server.Query = "SELECT * FROM " + tablename + "1;";
+                DataTable dt1 = server.ExecuteQuery();
+                server.Query = "SELECT * FROM " + tablename + "2;";
+                DataTable dt2 = server.ExecuteQuery();
+
+
+                for (var j = 1; j < (rows); j++)//loop through entries aka rows
+                {
+                    //generalsurveyresults1
+                    string queryInsert1 = "INSERT INTO " + tablename + "1 (";
+                    for (var k = 0; k < 132; k++)//get column names for query
                     {
-                        //generalsurveyresults1
-                        string queryInsert1 = "INSERT INTO _generalsurveyresults1 (";
-                        for( var k=1; k<133; k++)//get column names for query
+                        if (k == 131) //if it's the last column
                         {
-                            if (k == 132) //if it's the last column
-                            {
-                                queryInsert1 += "`" + xlRange.Cells[1, k].Value2.Trim() + "`) VALUES (";
-                            }
-                            else //while it's not the last column
-                            {
-                                queryInsert1 += "`" + xlRange.Cells[1, k].Value2.Trim() + "`,";
-                            }
+                            queryInsert1 += "`" + list[0][k] + "`) VALUES (";
                         }
-                        for (var m = 1; m < 133; m++)//get values for query
+                        else //while it's not the last column
                         {
-                            if (m == 132) //if it's the last column
-                            {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert1 += "NULL);";
-                                }
-                                else
-                                {
-                                    bool result = dt1.Columns[(m - 1)].DataType == System.Type.GetType("System.String");
-                                    if (result)
-                                    {
-                                        queryInsert1 += "'" + xlRange.Cells[j, m].Value2.ToString().Replace("'","\'") + "');";
-                                    }
-                                    else
-                                        queryInsert1 += "'" + xlRange.Cells[j, m].Value2 + "');";
-                                }
-                            }
-                            else //while it's not the last column
-                            {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert1 += "NULL,";
-                                }
-                                else
-                                {
-                                    bool result = dt1.Columns[(m - 1)].DataType == System.Type.GetType("System.String");
-                                    if (result)
-                                    {
-                                        queryInsert1 += "'" + xlRange.Cells[j, m].Value2.ToString().Replace("'", "\'") + "',";
-                                    }
-                                    else
-                                        queryInsert1 += "'" + xlRange.Cells[j, m].Value2 + "',";
-
-                                }
-                            }
+                            queryInsert1 += "`" + list[0][k] + "`,";
                         }
-                        textBox1.Text = "queryInsert1: " + queryInsert1;
-                        //Console.WriteLine("queryInsert1: " + queryInsert1);
-                        server.Row = j;
-                        server.Query = queryInsert1;
-                        server.ExecuteNonQuery();
-
-                        //generalsurveyresults2
-                        string queryInsert2 = "INSERT INTO _generalsurveyresults2 (`" + xlRange.Cells[1, 1].Value2.Trim() + "`,";
-                        for (var n = 133; n < 253; n++)//get column names for query
-                        {
-                            if (n == 252) //if it's the last column
-                            {
-                                queryInsert2 += "`" + xlRange.Cells[1, n].Value2.Trim() + "`) VALUES ('" + xlRange.Cells[j, 1].Value2 + "',";
-                            }
-                            else //while it's not the last column
-                            {
-                                queryInsert2 += "`" + xlRange.Cells[1, n].Value2.Trim() + "`,";
-                            }
-                        }
-                        for (var o = 133; o < 253; o++)//get values for query
-                        {
-                            if (o == 252) //if it's the last column
-                            {
-                                if (xlRange.Cells[j, o].Value2 == null)
-                                {
-                                    queryInsert2 += "NULL);";
-                                }
-                                else
-                                {
-
-                                    bool result = dt2.Columns[(o - 133)].DataType == System.Type.GetType("System.String");
-                                    if (result)
-                                    {
-                                        queryInsert2 += "'" + xlRange.Cells[j, o].Value2.ToString().Replace("'", "\'") + "');";
-                                    }
-                                    else
-                                        queryInsert2 += "'" + xlRange.Cells[j, o].Value2 + "');";
-                                }
-                            }
-                            else //while it's not the last column
-                            {
-                                if (xlRange.Cells[j, o].Value2 == null)
-                                {
-                                    queryInsert2 += "NULL,";
-                                }
-                                else
-                                {
-                                    //Console.WriteLine(dt2.Columns[(o - 1)].DataType == System.Type.GetType("System.String"));
-                                    bool result = dt2.Columns[(o - 133)].DataType == System.Type.GetType("System.String");
-                                    if (result)
-                                    {
-                                        queryInsert2 += "'" + xlRange.Cells[j, o].Value2.ToString().Replace("'", "\'") + "',";
-                                    }
-                                    else
-                                        queryInsert2 += "'" + xlRange.Cells[j, o].Value2 + "',";
-                                }
-                            }
-                        }
-                        textBox1.Text = "queryInsert2: " + queryInsert2;
-                        //Console.WriteLine("queryInsert2: " + queryInsert2);
-                        server.Query = queryInsert2;
-                        server.ExecuteNonQuery();
-
-                        progressBar1.Minimum = 0;
-                        progressBar1.Maximum = 332;
-                        progressBar1.PerformStep();
-                        label1.Text = (j-1) + " of " + 332 + " rows";
-                        label1.Refresh();
                     }
-
-
-                    if (i == xlWorkbook.Sheets.Count)
+                    for (var m = 0; m < 132; m++)//get values for query
                     {
-                        Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
-                        Proj_LogError("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
+                        if (m == 131) //if it's the last column
+                        {
+                            if (list[j][m] == null)
+                            {
+                                queryInsert1 += "NULL);";
+                            }
+                            else
+                            {
+                                bool result = dt1.Columns[(m - 1)].DataType == System.Type.GetType("System.String");
+                                if (result)
+                                {
+                                    queryInsert1 += "'" + list[j][m].Replace("'", "\'") + "');";
+                                }
+                                else
+                                    queryInsert1 += "'" + list[j][m] + "');";
+                            }
+                        }
+                        else //while it's not the last column
+                        {
+                            if (list[j][m] == null)
+                            {
+                                queryInsert1 += "NULL,";
+                            }
+                            else
+                            {
+                                bool result = dt1.Columns[(m)].DataType == System.Type.GetType("System.String");
+                                if (result)
+                                {
+                                    queryInsert1 += "'" + list[j][m].Replace("'", "\'") + "',";
+                                }
+                                else
+                                    queryInsert1 += "'" + list[j][m] + "',";
+
+                            }
+                        }
                     }
+                    textBox1.Text = "queryInsert1: " + queryInsert1;
+                    textBox1.Refresh();
+                    //Console.WriteLine("queryInsert1: " + queryInsert1);
+                    server.Row = j;
+                    server.Query = queryInsert1;
+                    server.ExecuteNonQuery();
+
+                    //generalsurveyresults2
+                    string queryInsert2 = "INSERT INTO " + tablename + "2 (`" + list[0][0] + "`,";
+                    for (var n = 132; n < (cols); n++)//get column names for query
+                    {
+                        if (n == (cols - 1)) //if it's the last column
+                        {
+                            queryInsert2 += "`" + list[0][n] + "`) VALUES ('" + list[j][0] + "',";
+                        }
+                        else //while it's not the last column
+                        {
+                            queryInsert2 += "`" + list[0][n] + "`,";
+                        }
+                    }
+                    for (var o = 132; o < (cols); o++)//get values for query
+                    {
+                        if (o == (cols - 1)) //if it's the last column
+                        {
+                            if (list[j][o] == null)
+                            {
+                                queryInsert2 += "NULL);";
+                            }
+                            else
+                            {
+
+                                bool result = dt2.Columns[(o - 132)].DataType == System.Type.GetType("System.String");
+                                if (result)
+                                {
+                                    queryInsert2 += "'" + list[j][o].Replace("'", "\'") + "');";
+                                }
+                                else
+                                    queryInsert2 += "'" + list[j][o] + "');";
+                            }
+                        }
+                        else //while it's not the last column
+                        {
+                            if (list[j][o] == null)
+                            {
+                                queryInsert2 += "NULL,";
+                            }
+                            else
+                            {
+                                //Console.WriteLine(dt2.Columns[(o - 1)].DataType == System.Type.GetType("System.String"));
+                                bool result = dt2.Columns[(o - 132)].DataType == System.Type.GetType("System.String");
+                                if (result)
+                                {
+                                    queryInsert2 += "'" + list[j][o].Replace("'", "\'") + "',";
+                                }
+                                else
+                                    queryInsert2 += "'" + list[j][o] + "',";
+                            }
+                        }
+                    }
+                    textBox1.Text = "queryInsert2: " + queryInsert2;
+                    textBox1.Refresh();
+                    //Console.WriteLine("queryInsert2: " + queryInsert2);
+                    server.Query = queryInsert2;
+                    server.ExecuteNonQuery();
+
+                    progressBar1.Minimum = 0;
+                    progressBar1.Maximum = rows - 1;
+                    progressBar1.PerformStep();
+                    label1.Text = "Processing " + (j) + " of " + (rows - 1) + " rows";
+                    label1.Refresh();
                 }
             }
-
+            Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done.");
+            Proj_LogError("Workbook '" + xlWorkbook.Name + "' done.");
         }
 
-        private void productSurveyResults(string file)
+        private void otherSurveyResults(string file, string tablename)
         {
-            server.Filename = file;
-            server.Query = "TRUNCATE _productsurveyresults";
-            server.ExecuteNonQuery();
+            Excel.Application xlApp = new Excel.Application();
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(file);
             if (file != "")
             {
-                //Read File
-                Excel.Application xlApp = new Excel.Application();
-                Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(file);
+                List<List<string>> list = SheetToList(xlWorkbook.Sheets[1]);
+                var cols = list[0].Count;
+                var rows = list.Count;
+                progressBar1.Value = 0;
+                server.Filename = file;
 
-                for (var i = 1; i <= xlWorkbook.Sheets.Count; i++)
+                string queryTable = "SELECT 1 FROM " + tablename + " LIMIT 1;";
+                server.Query = queryTable;
+                textBox1.Text = "queryTable: " + queryTable;
+                textBox1.Refresh();
+                //Console.WriteLine("queryTable: " + queryTable);
+                bool exists1 = server.ExecuteNonQuery();
+                if (!exists1)
                 {
-                    Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[i];
-                    Excel.Range xlRange = xlWorksheet.UsedRange;
+                    createTable(tablename, list, 1, cols);
+                }
 
-                    for (var j = 2; j < 33; j++)//loop through entries aka rows
+                server.Query = "TRUNCATE " + tablename;
+                server.ExecuteNonQuery();
+                for (var j = 1; j < (rows); j++)//loop through entries aka rows starting with row 2
+                {
+                    string queryInsert = "INSERT INTO " + tablename + " (";
+                    for (var k = 0; k < cols; k++)//get column names for query
                     {
-                        string queryInsert = "INSERT INTO _productsurveyresults (";
-                        for (var k = 1; k < 19; k++)//get column names for query
+                        if (k == (cols - 1)) //if it's the last column
                         {
-                            if (k == 18) //if it's the last column
+                            queryInsert += "`" + list[0][k] + "`) VALUES (";
+                        }
+                        else //while it's not the last column
+                        {
+                            queryInsert += "`" + list[0][k] + "`,";
+                        }
+                    }
+                    for (var m = 0; m < cols; m++)//get values for query
+                    {
+                        if (m == (cols - 1)) //if it's the last column
+                        {
+                            if (list[j][m] == null)
                             {
-                                queryInsert += "`" + xlRange.Cells[1, k].Value2.Trim() + "`) VALUES (";
+                                queryInsert += "NULL);";
                             }
-                            else //while it's not the last column
+                            else
                             {
-                                queryInsert += "`" + xlRange.Cells[1, k].Value2.Trim() + "`,";
+                                queryInsert += "'" + list[j][m] + "');";
                             }
                         }
-                        for (var m = 1; m < 19; m++)//get values for query
+                        else //while it's not the last column
                         {
-                            if (m == 18) //if it's the last column
+                            if (list[j][m] == null)
                             {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert += "NULL);";
-                                }
-                                else
-                                {
-                                    queryInsert += "'" + xlRange.Cells[j, m].Value2 + "');";
-                                }
+                                queryInsert += "NULL,";
                             }
-                            else //while it's not the last column
+                            else
                             {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert += "NULL,";
-                                }
-                                else
-                                {
-                                    queryInsert += "'" + xlRange.Cells[j, m].Value2 + "',";
-                                }
-                                
+                                queryInsert += "'" + list[j][m] + "',";
                             }
-                        }
-                        textBox1.Text = "queryInsert: " + queryInsert;
-                        //Console.WriteLine("queryInsert: " + queryInsert);
-                        server.Row = j;
-                        server.Query = queryInsert;
-                        server.ExecuteNonQuery();
 
-                        progressBar1.Minimum = 0;
-                        progressBar1.Maximum = 31;
-                        progressBar1.PerformStep();
-                        label1.Text = (j - 1) + " of " + 31 + " rows";
-                        label1.Refresh();
+                        }
                     }
-                    if (i == xlWorkbook.Sheets.Count)
-                    {
-                        Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
-                        Proj_LogError("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
-                    }
+                    textBox1.Text = "queryInsert: " + queryInsert;
+                    textBox1.Refresh();
+                    //Console.WriteLine("queryInsert: " + queryInsert);
+                    server.Row = j;
+                    server.Query = queryInsert;
+                    server.ExecuteNonQuery();
+                    progressBar1.Minimum = 0;
+                    progressBar1.Maximum = list.Count - 1;
+                    progressBar1.PerformStep();
+                    label1.Text = "Processing " + (j) + " of " + (list.Count - 1) + " rows";
+                    label1.Refresh();
                 }
             }
-
-        }
-
-        private void retailerSurveyResults(string file)
-        {
-            server.Filename = file;
-            server.Query = "TRUNCATE _retailersurveyresults";
-            server.ExecuteNonQuery();
-            if (file != "")
-            {
-                //Read File
-                Excel.Application xlApp = new Excel.Application();
-                Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(file);
-
-                for (var i = 1; i <= xlWorkbook.Sheets.Count; i++)
-                {
-                    Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[i];
-                    Excel.Range xlRange = xlWorksheet.UsedRange;
-
-                    for (var j = 2; j < 30; j++)//loop through entries aka rows
-                    {
-                        string queryInsert = "INSERT INTO _retailersurveyresults (";
-                        for (var k = 1; k < 82; k++)//get column names for query
-                        {
-                            if (k == 81) //if it's the last column
-                            {
-                                queryInsert += "`" + xlRange.Cells[1, k].Value2.Trim() + "`) VALUES (";
-                            }
-                            else //while it's not the last column
-                            {
-                                queryInsert += "`" + xlRange.Cells[1, k].Value2.Trim() + "`,";
-                            }
-                        }
-                        for (var m = 1; m < 82; m++)//get values for query
-                        {
-                            if (m == 81) //if it's the last column
-                            {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert += "NULL);";
-                                }
-                                else
-                                {
-                                    queryInsert += "'" + xlRange.Cells[j, m].Value2 + "');";
-                                }
-                                
-                            }
-                            else //while it's not the last column
-                            {
-                                if (xlRange.Cells[j, m].Value2 == null)
-                                {
-                                    queryInsert += "NULL,";
-                                }
-                                else
-                                {
-                                    queryInsert += "'" + xlRange.Cells[j, m].Value2 + "',";
-                                }
-                            }
-                        }
-                        textBox1.Text = "queryInsert: " + queryInsert;
-                        //Console.WriteLine("queryInsert: " + queryInsert);
-                        server.Row = j;
-                        server.Query = queryInsert;
-                        server.ExecuteNonQuery();
-
-                        progressBar1.Minimum = 0;
-                        progressBar1.Maximum = 28;
-                        progressBar1.PerformStep();
-                        label1.Text = (j - 1) + " of " + 28 + " rows";
-                        label1.Refresh();
-                    }
-                    if (i == xlWorkbook.Sheets.Count)
-                    {
-                        Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
-                        Proj_LogError("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
-                    }
-                }
-            }
-
+            Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
+            Proj_LogError("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
         }
 
         private string getTableName(string viewname)
@@ -526,11 +516,68 @@ namespace ViewToTable
             bld.AppendLine(message);
             bld.AppendLine(txtLog.Text);
             txtLog.Text = bld.ToString();
+            txtLog.Refresh();
         }
 
-        private void IncreaseProgressBar()
+        private List<List<string>> SheetToList(Excel._Worksheet sheet)
         {
-            progressBar1.Increment(1);
+            Excel.Range xlRange = sheet.UsedRange;
+            var xlRows = xlRange.Rows.Count;
+            var xlColumns = xlRange.Columns.Count;
+            var xlColumnsA = xlRange.Columns.Address.Replace(xlRows.ToString(), "").Split(':')[1];
+            var rowstart = 1;
+
+            List<List<string>> list = new List<List<string>>();
+            List<string> item1 = new List<string>();
+
+            for (var i = rowstart; i < (xlRows + 1); i++)
+            {
+                List<string> item = new List<string>();
+                Excel.Range range = sheet.get_Range("A" + i.ToString(), xlColumnsA + i.ToString());
+                System.Array itemar = (System.Array)range.Cells.Value;
+                for (var j = 1; j < xlColumns + 1; j++)
+                {
+                    if (itemar.GetValue(1, j) != null)
+                    {
+                        item.Add((string)itemar.GetValue(1, j).ToString());
+                    }
+                    else
+                        item.Add("");
+                }
+
+                list.Add(item);
+                var progressbarMax = xlRows - 1;
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = progressbarMax;
+                progressBar1.PerformStep();
+                label1.Text = "Reading " + (i - 1) + " of " + progressbarMax + " rows";
+                label1.Refresh();
+            }
+            Console.WriteLine("Row Count: " + list.Count);
+
+            return list;
+        }
+
+        private void createTable (string tablename, List<List<string>> list, int start, int fin)
+        {
+            string queryCreate = "CREATE TABLE `" + tablename + "` (`" + list[0][0] + "` int(11) DEFAULT NULL,";
+            for (var k = start; k < fin; k++)//get column names for query
+            {
+                if (k == (fin - 1)) //if it's the last column
+                {
+                    queryCreate += "`" + list[0][k] + "` text) ENGINE = InnoDB DEFAULT CHARSET = utf8;";
+                }
+                else //while it's not the last column
+                {
+                    queryCreate += "`" + list[0][k] + "` text,";
+                }
+            }
+            textBox1.Text = "queryCreate: " + queryCreate;
+            textBox1.Refresh();
+            //Console.WriteLine("queryCreate: " + queryCreate);
+            server.Query = queryCreate;
+            server.ExecuteNonQuery();
+            Proj_LogError("Table '" + tablename + "' created.");
         }
     }
 }
