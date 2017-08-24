@@ -507,7 +507,7 @@ namespace ViewToTable
 
         private string getTableName(string viewname)
         {
-            return viewname.Replace("View", "Vtable");
+            return viewname.ToLower().Replace("view", "vtable");
         }
 
         private void Proj_LogError(string message)
