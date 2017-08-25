@@ -106,6 +106,15 @@ namespace ViewToTable
                             }
                         }
 
+                        if (checkBox1.Checked == true)
+                        {
+                            SQLToCSV(filename);
+                        }
+                        else
+                        {
+                            //
+                        }
+
                     }
                     else if (filename.Contains("234584")) //General Survey Results
                     {
@@ -163,6 +172,87 @@ namespace ViewToTable
                 }
                 if (textBox1.Text != "")
                     Clipboard.SetText(textBox1.Text);
+            }
+        }
+
+        private void SQLToCSV (string filename)
+        {
+            server.Filename = filename;
+            filename = filename.Replace(".sql", "");
+            string queryView = "SELECT * FROM " + filename + ";";
+            server.Query = queryView;
+            textBox1.Text = "queryView: " + queryView;
+            textBox1.Refresh();
+            //Console.WriteLine("queryView: " + queryView);//delete
+            bool exists = server.ExecuteNonQuery();
+            if (exists)
+            {
+                DataTable dt = server.ExecuteQuery();
+                StringBuilder columnValues = new StringBuilder();
+                StringBuilder RowValues = new StringBuilder();
+                columnValues.Clear();
+                RowValues.Clear();
+
+                for (int n = 0; n < dt.Columns.Count; n++)
+                {
+                    if (n == (dt.Columns.Count - 1)) //if it's the last column
+                    {
+                        columnValues.Append(dt.Columns[n].ColumnName);
+                    }
+                    else //while it's not the last column
+                    {
+                        columnValues.Append(dt.Columns[n].ColumnName + ",");
+                    }
+                }
+                RowValues.AppendLine(columnValues.ToString());
+
+                //get data
+                for (int r = 0; r < dt.Rows.Count; r++)
+                {
+                    columnValues.Clear();
+                    for (int c = 0; c < dt.Columns.Count; c++)
+                    {
+                        if (c == (dt.Columns.Count - 1)) //if it's the last column
+                        {
+                            bool result = dt.Columns[(c)].DataType == System.Type.GetType("System.String");
+                            if (result)
+                            {
+                                columnValues.Append("\"" + dt.Rows[r][c] + "\"");
+                            }
+                            else
+                                columnValues.Append(dt.Rows[r][c]);
+                        }
+                        else //while it's not the last column
+                        {
+                            bool result = dt.Columns[(c)].DataType == System.Type.GetType("System.String");
+                            if (result)
+                            {
+                                columnValues.Append("\"" + dt.Rows[r][c] + "\",");
+                            }
+                            else
+                                columnValues.Append(dt.Rows[r][c] + ",");
+                        }
+                    }
+                    RowValues.AppendLine(columnValues.ToString());
+
+                    textBox1.Text = "CSV: " + RowValues.ToString();
+                    textBox1.Refresh();
+                    //Console.WriteLine("CSV: " + RowValues.ToString());//delete
+                }
+                WriteToCSV(filename, RowValues.ToString().Trim());
+            }
+            else
+            {
+                Console.WriteLine("View " + filename + " does not exist.");
+                Proj_LogError("View " + filename + " does not exist.");
+            }
+        }
+
+        public void WriteToCSV(string filename, string data)
+        {
+            using (StreamWriter sw = new StreamWriter("D:\\Projects\\ViewToTable\\" + filename + ".csv"))
+            {
+                sw.WriteLine(data);
             }
         }
 
