@@ -15,11 +15,46 @@ namespace ViewToTable
     public partial class Form1 : Form
     {
         MySQLServer server = null;
+        string guide = ".::GUIDE TO 5 FEATURES::.\r\n\r\n" +
+                "CONVERTING VIEWS TO TABLE: SINGLE VIEW NAME\r\n" +
+                "1. Type in the view name on the text input field at the top right. (Example: ViewGSM_G25_Region)\r\n" +
+                "2. Click Run.\r\n" +
+                "3. Outputs table at 192.168.43.85 under votf_reports database.\r\n\r\n" +
+                "CONVERTING VIEWS TO TABLE: MULTIPLE VIEW NAMES\r\n" +
+                "1. Type in the view names on a text file; separated by either a new line or comma.\r\n" +
+                "2. Save it as .vls file in any location.\r\n" +
+                "3. Drag the file onto the large white textbox at the middle. (Exammple: viewname.vls)\r\n" +
+                "4. Outputs table at 192.168.43.85 under votf_reports database.\r\n\r\n" +
+                "RUNNING AN SQL STATEMENT FROM A .SQL FILE\r\n" +
+                "*examples of .sql files can be found at ~Dropbox\\Shared\\1-VOTF\\8 - Reports\\queries\\views\\\r\n" +
+                "1. Drag the .sql file onto the large white textbox at the middle. (Example: ViewGSM_Count.sql)\r\n" +
+                "2. Outputs table at 192.168.43.85 under votf_reports database.\r\n\r\n" +
+                "CONVERTING AN SQL TO A CSV FILE\r\n" +
+                "*examples of .sql files can be found at ~Dropbox\\Shared\\1-VOTF\\8 - Reports\\queries\\views\\\r\n" +
+                "1. Check the checkbox \"Export to CSV File\" before dragging in the file.\r\n" +
+                "2. Drag the .sql file onto the large white textbox at the middle. (Example: ViewGSM_Count.sql)\r\n" +
+                "3. Outputs .csv file in D:\\.\r\n\r\n" +
+                "SAVE SURVEYS IN EXCEL FORMAT TO MYSQL TABLES\r\n" +
+                "*examples of .sql files can be found at ~Dropbox\\Shared\\1-VOTF\\9 - Data backup\\surveys\\raw\\\r\n" +
+                "*only .xls and .xlsx files are accepted\r\n" +
+                "1. Drag the excel file onto the large white textbox at the middle. (Example: results-survey977717 (2017-07-31).xlsx)\r\n" +
+                "2. Outputs table at 192.168.43.85 under votf_reports database.\r\n\r\n" +
+                "*List of Accepted Surveys*\r\n" +
+                "234584 (General Survey)\r\n" +
+                "672569 (Midpoint - General)\r\n" +
+                "787585 (Final - General)\r\n" +
+                "977717 (Retailer Survey)\r\n" +
+                "818999 (Midpoint - Retailer)\r\n" +
+                "473321 (Final - Retailer)\r\n" +
+                "972221 (Product Survey)\r\n" +
+                "788185 (Final - Product)\r\n\r\n" +
+                "Log errors can be found at D:\\ViewToTableErrors.txt";
 
         public Form1()
         {
             InitializeComponent();
             Initialize();
+            textBox1.Text = guide;
         }
 
         public void Initialize()
@@ -89,7 +124,7 @@ namespace ViewToTable
                             progressBar1.Minimum = 0;
                             progressBar1.Maximum = viewname.Count;
                             progressBar1.PerformStep();
-                            label1.Text = "Processing view " + completed + " of " + viewname.Count + " views";
+                            label1.Text = "Processing view " + completed + " of " + viewname.Count + " view(s)";
                             label1.Refresh();
                         }
                     }
@@ -103,12 +138,22 @@ namespace ViewToTable
                             {
                                 server.Query = str;
                                 server.ExecuteNonQuery();
+                                progressBar1.Minimum = 0;
+                                progressBar1.Maximum = 1;
+                                progressBar1.PerformStep();
+                                label1.Text = "Executing " + 1 + " of " + 1 + " SQL file(s)";
+                                label1.Refresh();
                             }
                         }
 
                         if (checkBox1.Checked == true)
                         {
                             SQLToCSV(filename);
+                            progressBar1.Minimum = 0;
+                            progressBar1.Maximum = 1;
+                            progressBar1.PerformStep();
+                            label1.Text = "Converting " + 1 + " of " + 1 + " SQL file(s)";
+                            label1.Refresh();
                         }
                         else
                         {
@@ -166,12 +211,36 @@ namespace ViewToTable
                     }
                     if (i == filelist.Length - 1)
                     {
+                        textBox1.Text = guide;
                         Console.WriteLine("Process done!");
                         Proj_LogError("Process done!");
                     }
                 }
                 if (textBox1.Text != "")
                     Clipboard.SetText(textBox1.Text);
+            }
+        }
+
+        private void buttonRunView_Click(object sender, EventArgs e)
+        {
+            if (textBoxViewName.Text == "")
+            {
+                Console.WriteLine("View name is empty.");
+                Proj_LogError("View name field is empty.");
+            }
+            else
+            {
+                Console.WriteLine("Processing view " + textBoxViewName.Text.Trim());
+                Proj_LogError("Processing view " + textBoxViewName.Text.Trim());
+                ViewToTable(textBoxViewName.Text.Trim());
+                progressBar1.Minimum = 0;
+                progressBar1.Maximum = 1;
+                progressBar1.PerformStep();
+                label1.Text = "Processing view " + 1 + " of " + 1 + " view(s)";
+                label1.Refresh();
+                Console.WriteLine("Process done!");
+                Proj_LogError("Process done!");
+                textBox1.Text = guide;
             }
         }
 
@@ -243,16 +312,18 @@ namespace ViewToTable
             }
             else
             {
-                Console.WriteLine("View " + filename + " does not exist.");
-                Proj_LogError("View " + filename + " does not exist.");
+                Console.WriteLine("Failed: View " + filename + " does not exist.");
+                Proj_LogError("Failed: View " + filename + " does not exist.");
             }
         }
 
         public void WriteToCSV(string filename, string data)
         {
-            using (StreamWriter sw = new StreamWriter("D:\\Projects\\ViewToTable\\" + filename + ".csv"))
+            using (StreamWriter sw = new StreamWriter("D:\\" + filename + ".csv"))
             {
                 sw.WriteLine(data);
+                Console.WriteLine("CSV file can be found at D:\\" + filename + ".csv");
+                Proj_LogError("CSV file can be found at D:\\" + filename + ".csv");
             }
         }
 
@@ -331,11 +402,13 @@ namespace ViewToTable
                     server.ExecuteNonQuery();
 
                 }
+                Console.WriteLine("Table " + getTableName(filename) + " created.");
+                Proj_LogError("Table " + getTableName(filename) + " created.");
             }
             else
             {
-                Console.WriteLine("View " + filename + " does not exist.");
-                Proj_LogError("View " + filename + " does not exist.");
+                Console.WriteLine("Failed: View " + filename + " does not exist.");
+                Proj_LogError("Failed: View " + filename + " does not exist.");
             }
         }
 
