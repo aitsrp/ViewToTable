@@ -678,7 +678,7 @@ namespace ViewToTable
             StringBuilder bld = new StringBuilder();
             bld.AppendLine(message);
             bld.AppendLine(txtLog.Text);
-            txtLog.Text = bld.ToString();
+            txtLog.Text = bld.ToString().Trim();
             txtLog.Refresh();
         }
 
