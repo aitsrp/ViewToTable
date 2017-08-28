@@ -111,9 +111,9 @@
             // 
             this.groupBox2.Controls.Add(this.buttonRunView);
             this.groupBox2.Controls.Add(this.textBoxViewName);
-            this.groupBox2.Location = new System.Drawing.Point(13, 13);
+            this.groupBox2.Location = new System.Drawing.Point(13, 9);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(421, 42);
+            this.groupBox2.Size = new System.Drawing.Size(421, 46);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "View Name:";

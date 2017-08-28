@@ -584,6 +584,8 @@ namespace ViewToTable
             }
             Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done.");
             Proj_LogError("Workbook '" + xlWorkbook.Name + "' done.");
+            xlWorkbook.Close();
+            xlApp.Quit();
         }
 
         private void otherSurveyResults(string file, string tablename)
@@ -666,6 +668,8 @@ namespace ViewToTable
             }
             Console.WriteLine("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
             Proj_LogError("Workbook '" + xlWorkbook.Name + "' done: " + xlWorkbook.Sheets.Count + " worksheet(s)");
+            xlWorkbook.Close();
+            xlApp.Quit();
         }
 
         private string getTableName(string viewname)
