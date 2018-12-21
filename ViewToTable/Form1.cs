@@ -167,49 +167,49 @@ namespace ViewToTable
                     {
                         Console.WriteLine("Processing General Survey Results...");
                         Proj_LogError("Processing General Survey Results...");
-                        generalSurveyResults(path, "_generalsurveyresults");
+                        generalSurveyResults(path, "generalsurveyresults");
                     }
                     else if (filename.Contains("672569")) //General Survey Results Midpoint
                     {
                         Console.WriteLine("Processing General Survey Results Midpoint...");
                         Proj_LogError("Processing General Survey Results Midpoint...");
-                        generalSurveyResults(path, "_generalsurveyresultsm");
+                        generalSurveyResults(path, "generalsurveyresultsm");
                     }
                     else if (filename.Contains("787585")) //General Survey Results Final
                     {
                         Console.WriteLine("Processing General Survey Results Final...");
                         Proj_LogError("Processing General Survey Results Final...");
-                        generalSurveyResults(path, "_generalsurveyresultsf");
+                        generalSurveyResults(path, "generalsurveyresultsf");
                     }
                     else if (filename.Contains("972221")) // Product Survey Results
                     {
                         Console.WriteLine("Processing Product Survey Results...");
                         Proj_LogError("Processing Product Survey Results...");
-                        otherSurveyResults(path, "_productsurveyresults");
+                        otherSurveyResults(path, "productsurveyresults");
                     }
                     else if (filename.Contains("788185")) // Product Survey Results Final
                     {
                         Console.WriteLine("Processing Product Survey Results Final...");
                         Proj_LogError("Processing Product Survey Results Final...");
-                        otherSurveyResults(path, "_productsurveyresultsf");
+                        otherSurveyResults(path, "productsurveyresultsf");
                     }
                     else if (filename.Contains("977717")) //Retailer Survey Results
                     {
                         Console.WriteLine("Processing Retailer Survey Results...");
                         Proj_LogError("Processing Retailer Survey Results...");
-                        otherSurveyResults(path, "_retailersurveyresults");
+                        otherSurveyResults(path, "retailersurveyresults");
                     }
                     else if (filename.Contains("818999")) //Retailer Survey Results Midpoint
                     {
                         Console.WriteLine("Processing Retailer Survey Results Midpoint...");
                         Proj_LogError("Processing Retailer Survey Results Midpoint...");
-                        otherSurveyResults(path, "_retailersurveyresultsm");
+                        otherSurveyResults(path, "retailersurveyresultsm");
                     }
                     else if (filename.Contains("473321")) //Retailer Survey Results Final
                     {
                         Console.WriteLine("Processing Retailer Survey Results Final...");
                         Proj_LogError("Processing Retailer Survey Results Final...");
-                        otherSurveyResults(path, "_retailersurveyresultsf");
+                        otherSurveyResults(path, "retailersurveyresultsf");
                     }
                     if (i == filelist.Length - 1)
                     {
